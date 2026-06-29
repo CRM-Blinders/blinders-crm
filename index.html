@@ -750,6 +750,13 @@
   function toggleDealGanado(){
     dealGanadoExpanded=!dealGanadoExpanded;
     document.getElementById("deal-col-ganado").classList.toggle("expanded",dealGanadoExpanded);
+    const cardsEl=document.getElementById("deal-cards-ganado");
+    cardsEl.style.display=dealGanadoExpanded?"flex":"none";
+    cardsEl.style.flexDirection="column";
+    cardsEl.style.gap="8px";
+    cardsEl.style.padding="10px";
+    cardsEl.style.overflowY="auto";
+    cardsEl.style.maxHeight="var(--col-h)";
     if(dealGanadoExpanded) renderGanadoCards();
   }
 
