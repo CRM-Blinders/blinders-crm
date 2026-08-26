@@ -704,6 +704,14 @@
       }else{
         const r=await sbFetch("tasks",{method:"POST",body:JSON.stringify({...data,creator:currentUser})});
         if(r&&r[0])tasks.unshift(r[0]);
+        // Send notification if assigned to someone else
+        if(!isLibre && data.assignee && data.assignee !== currentUser){
+          fetch("https://jphpovssdzggcxqvivvp.supabase.co/functions/v1/send-new-task-notification",{
+            method:"POST",
+            headers:{"Authorization":"Bearer sb_publishable_dDZmBOuUIJiPDysX2nYIuQ_SnD-9HBU","Content-Type":"application/json"},
+            body:JSON.stringify({assignee:data.assignee,creator:currentUser,title:data.title,priority:data.priority,due_date:data.due_date})
+          });
+        }
         toast(isLibre?"🟣 Tarea disponible publicada":"✅ Tarea creada");
       }
       updateAll();closeModal();
