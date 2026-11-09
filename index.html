@@ -296,7 +296,16 @@
     <div id="view-comercial" class="hidden">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div style="font-size:16px;font-weight:600;color:var(--text)">Panel Comercial</div>
-        <button class="btn-add" onclick="openDealModal()">＋ Nueva oferta</button>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <select id="deal-filter" onchange="setDealFilter(this.value)" title="Filtrar por comercial"
+            style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:var(--text);cursor:pointer;">
+            <option value="">Todos los comerciales</option>
+            <option value="Ruben">Ruben</option>
+            <option value="Carles">Carles</option>
+            <option value="Aaron">Aaron</option>
+          </select>
+          <button class="btn-add" onclick="openDealModal()">＋ Nueva oferta</button>
+        </div>
       </div>
       <div class="kanban-board kanban-board-comercial">
         <!-- Posible pedido x4 -->
@@ -725,15 +734,21 @@
     catch(e){ toast("❌ Error al cargar ofertas"); }
   }
 
+  const COMERCIALES=["Ruben","Carles","Aaron"];
+  let dealFilter="";
+  function visibleDeals(){return dealFilter?deals.filter(d=>d.assignee===dealFilter):deals;}
+  function setDealFilter(v){dealFilter=v;updateDeals();}
+
   function updateDeals(){
-    document.getElementById("count-comercial").textContent=deals.filter(d=>d.status!=="ganado").length;
-    document.getElementById("cnt-deal-posible").textContent=deals.filter(d=>d.status==="posible").length;
-    document.getElementById("cnt-deal-ganado").textContent=deals.filter(d=>d.status==="ganado").length;
+    const vd=visibleDeals();
+    document.getElementById("count-comercial").textContent=vd.filter(d=>d.status!=="ganado").length;
+    document.getElementById("cnt-deal-posible").textContent=vd.filter(d=>d.status==="posible").length;
+    document.getElementById("cnt-deal-ganado").textContent=vd.filter(d=>d.status==="ganado").length;
     if(currentTab==="comercial") renderDeals();
   }
 
   function renderDeals(){
-    const posibles=deals.filter(d=>d.status==="posible").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    const posibles=visibleDeals().filter(d=>d.status==="posible").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
     // Fill column 1 up to capacity, then column 2, etc. Beyond 4*CAPACITY, overflow into last column with scroll.
     const CAPACITY=7;
     const buckets=[[],[],[],[]];
@@ -749,7 +764,7 @@
 
   function renderGanadoCards(){
     const c=document.getElementById("deal-cards-ganado");
-    const ganados=deals.filter(d=>d.status==="ganado").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    const ganados=visibleDeals().filter(d=>d.status==="ganado").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
     c.innerHTML=ganados.length===0
       ?`<div style="text-align:center;padding:20px 10px;color:var(--text3);font-size:12px;">Sin ganados aún</div>`
       :ganados.map(d=>buildDealCard(d)).join("");
@@ -789,15 +804,16 @@
 
   function buildDealSelects(){
     const sel=document.getElementById("d-assignee");sel.innerHTML="";
-    USERS.forEach(u=>{const o=document.createElement("option");o.value=u;o.textContent=u;sel.appendChild(o);});
-    sel.value=currentUser;
+    COMERCIALES.forEach(u=>{const o=document.createElement("option");o.value=u;o.textContent=u;sel.appendChild(o);});
+    sel.value=COMERCIALES.includes(currentUser)?currentUser:COMERCIALES[0];
   }
 
   function openDealModal(defaultStatus){
     editingDealId=null;
     document.getElementById("deal-modal-title").textContent="Nueva oferta";
     document.getElementById("d-client").value="";
-    document.getElementById("d-assignee").value=currentUser;
+    buildDealSelects();
+    document.getElementById("d-assignee").value=(dealFilter&&COMERCIALES.includes(dealFilter))?dealFilter:(COMERCIALES.includes(currentUser)?currentUser:COMERCIALES[0]);
     document.getElementById("d-status").value=defaultStatus||"oferta";
     document.getElementById("deal-modal-overlay").classList.remove("hidden");
     setTimeout(()=>document.getElementById("d-client").focus(),100);
@@ -808,7 +824,10 @@
     editingDealId=id;
     document.getElementById("deal-modal-title").textContent="Editar oferta";
     document.getElementById("d-client").value=deal.client;
-    document.getElementById("d-assignee").value=deal.assignee;
+    buildDealSelects();
+    const dsel=document.getElementById("d-assignee");
+    if(!COMERCIALES.includes(deal.assignee)){const o=document.createElement("option");o.value=deal.assignee;o.textContent=deal.assignee;dsel.appendChild(o);}
+    dsel.value=deal.assignee;
     document.getElementById("d-status").value=deal.status;
     document.getElementById("deal-modal-overlay").classList.remove("hidden");
   }
