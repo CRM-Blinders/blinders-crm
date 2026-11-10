@@ -772,7 +772,7 @@
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px;color:var(--text2);">
             <div class="card-avatar" style="background:${col(c.author)}">${ini(c.author)}</div>
             <strong>${esc(c.author)}</strong><span>· ${fmtDateTime(c.created_at)}</span>
-            ${c.author===currentUser?`<button class="card-btn del" style="margin-left:auto" onclick="deleteComment('${c.id}')" title="Eliminar">🗑️</button>`:""}
+            <button class="card-btn del" style="margin-left:auto" onclick="deleteComment('${c.id}')" title="Eliminar">🗑️</button>
           </div>
           <div style="font-size:13px;color:var(--text);white-space:pre-wrap;word-break:break-word;">${esc(c.text)}</div>
         </div>`).join("");
@@ -837,7 +837,7 @@
 
   function buildDealCard(deal){
     const canEdit=deal.assignee===currentUser||deal.creator===currentUser||true;
-    const canDelete=deal.creator===currentUser;
+    const canDelete=true;
     return`<div class="kanban-card" draggable="true" id="deal-card-${deal.id}"
       ondragstart="onDealDragStart(event,'${deal.id}')" ondragend="onDragEnd()">
       <div class="card-title">${esc(deal.client)}</div>
