@@ -72,8 +72,7 @@
   .kanban-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .kanban-board{display:flex;gap:14px;align-items:flex-start;}
   .kanban-board-comercial{gap:10px;}
-  .kanban-board-comercial .deal-posible-col{flex:1;min-width:0;}
-  .kanban-board-comercial .deal-ganado-col{flex:1;min-width:0;}
+  .kanban-board-comercial .deal-col{flex:1;min-width:0;}
   .kanban-board-comercial .kanban-col-header{padding:10px 10px;}
   .kanban-board-comercial .kanban-col-title{font-size:12px;}
   .kanban-board-comercial .kanban-cards{padding:8px;max-height:var(--col-h);overflow-y:auto;}
@@ -304,12 +303,20 @@
             <option value="Carles">Carles</option>
             <option value="Aaron">Aaron</option>
           </select>
-          <button class="btn-add" onclick="openDealModal()">＋ Nueva oferta</button>
+          <button class="btn-add" style="white-space:nowrap" onclick="openDealModal()">＋ Nueva oferta</button>
         </div>
       </div>
       <div class="kanban-board kanban-board-comercial">
-        <!-- Posible pedido x4 -->
-        <div class="kanban-col deal-posible-col" id="deal-col-posible-0"
+        <div class="kanban-col deal-col" id="deal-col-cerrar"
+          ondragover="onDealDragOver(event,'cerrar')" ondragleave="onDragLeave(event)" ondrop="onDealDrop(event,'cerrar')">
+          <div class="kanban-col-header" style="background:#fff1f0;border-radius:10px 10px 0 0">
+            <div class="kanban-col-title" style="color:#c0392b">🎯 Para cerrar</div>
+            <span class="kanban-col-count" id="cnt-deal-cerrar" style="background:#fde2df;color:#c0392b">0</span>
+          </div>
+          <div class="kanban-cards" id="deal-cards-cerrar"></div>
+          <button class="add-card-btn" onclick="openDealModal('cerrar')">＋ Añadir</button>
+        </div>
+        <div class="kanban-col deal-col" id="deal-col-posible-0"
           ondragover="onDealDragOver(event,'posible')" ondragleave="onDragLeave(event)" ondrop="onDealDrop(event,'posible')">
           <div class="kanban-col-header" style="background:#fffbeb;border-radius:10px 10px 0 0">
             <div class="kanban-col-title" style="color:#9a6c00">🔍 Posible pedido</div>
@@ -318,7 +325,7 @@
           <div class="kanban-cards" id="deal-cards-posible-0"></div>
           <button class="add-card-btn" onclick="openDealModal('posible')">＋ Añadir</button>
         </div>
-        <div class="kanban-col deal-posible-col" id="deal-col-posible-1"
+        <div class="kanban-col deal-col" id="deal-col-posible-1"
           ondragover="onDealDragOver(event,'posible')" ondragleave="onDragLeave(event)" ondrop="onDealDrop(event,'posible')">
           <div class="kanban-col-header" style="background:#fffbeb;border-radius:10px 10px 0 0">
             <div class="kanban-col-title" style="color:#9a6c00">🔍 Posible pedido</div>
@@ -327,7 +334,7 @@
           <div class="kanban-cards" id="deal-cards-posible-1"></div>
           <button class="add-card-btn" onclick="openDealModal('posible')">＋ Añadir</button>
         </div>
-        <div class="kanban-col deal-posible-col" id="deal-col-posible-2"
+        <div class="kanban-col deal-col" id="deal-col-posible-2"
           ondragover="onDealDragOver(event,'posible')" ondragleave="onDragLeave(event)" ondrop="onDealDrop(event,'posible')">
           <div class="kanban-col-header" style="background:#fffbeb;border-radius:10px 10px 0 0">
             <div class="kanban-col-title" style="color:#9a6c00">🔍 Posible pedido</div>
@@ -336,27 +343,14 @@
           <div class="kanban-cards" id="deal-cards-posible-2"></div>
           <button class="add-card-btn" onclick="openDealModal('posible')">＋ Añadir</button>
         </div>
-        <div class="kanban-col deal-posible-col" id="deal-col-posible-3"
-          ondragover="onDealDragOver(event,'posible')" ondragleave="onDragLeave(event)" ondrop="onDealDrop(event,'posible')">
-          <div class="kanban-col-header" style="background:#fffbeb;border-radius:10px 10px 0 0">
-            <div class="kanban-col-title" style="color:#9a6c00">🔍 Posible pedido</div>
-            <span class="kanban-col-count">&nbsp;</span>
+        <div class="kanban-col deal-col" id="deal-col-proyecto"
+          ondragover="onDealDragOver(event,'proyecto')" ondragleave="onDragLeave(event)" ondrop="onDealDrop(event,'proyecto')">
+          <div class="kanban-col-header" style="background:#eef4ff;border-radius:10px 10px 0 0">
+            <div class="kanban-col-title" style="color:#2f5fb3">🗓️ Proyecto a 1 año vista</div>
+            <span class="kanban-col-count" id="cnt-deal-proyecto" style="background:#dfe9fb;color:#2f5fb3">0</span>
           </div>
-          <div class="kanban-cards" id="deal-cards-posible-3"></div>
-          <button class="add-card-btn" onclick="openDealModal('posible')">＋ Añadir</button>
-        </div>
-        <!-- Ganado — colapsado -->
-        <div class="kanban-col-done deal-ganado-col" id="deal-col-ganado"
-          ondragover="onDealDragOver(event,'ganado')" ondragleave="onDragLeave(event)" ondrop="onDealDrop(event,'ganado')">
-          <div class="done-header" onclick="toggleDealGanado()">
-            <div class="done-header-label">
-              <span class="done-title" style="color:#0d7a55">🏆 Ganado</span>
-              <span class="done-count" id="cnt-deal-ganado" style="background:#e6f4ef;color:#0d7a55">0</span>
-            </div>
-            <span class="done-toggle" style="color:#0d7a55">▲</span>
-          </div>
-          <div class="done-collapsed-hint" onclick="toggleDealGanado()" style="display:none"></div>
-          <div class="done-cards" id="deal-cards-ganado" style="display:none"></div>
+          <div class="kanban-cards" id="deal-cards-proyecto"></div>
+          <button class="add-card-btn" onclick="openDealModal('proyecto')">＋ Añadir</button>
         </div>
       </div>
     </div>
@@ -435,8 +429,9 @@
       <div class="form-row"><label>Responsable</label><select id="d-assignee"></select></div>
       <div class="form-row" id="d-status-row"><label>Estado</label>
         <select id="d-status">
+          <option value="cerrar">Para cerrar</option>
           <option value="posible">Posible pedido</option>
-          <option value="ganado">Ganado</option>
+          <option value="proyecto">Proyecto a 1 año vista</option>
         </select>
       </div>
     </div>
@@ -454,7 +449,7 @@
   const COLORS=["#1b3a6b","#2452a0","#0d7a55","#9a3b00","#6b1b4a","#1b6b5a","#6b3b00","#1b4a6b","#3b1b6b"];
   const ACTIVE_COLS=["libre","pendiente","progreso"];
 
-  let currentUser=null,tasks=[],deals=[],currentTab="kanban",editingId=null,assignMode="asignar",dragId=null,doneExpanded=false,editingDealId=null,dealDragId=null,dealGanadoExpanded=false;
+  let currentUser=null,tasks=[],deals=[],currentTab="kanban",editingId=null,assignMode="asignar",dragId=null,doneExpanded=false,editingDealId=null,dealDragId=null;
 
   async function sbFetch(path,options={}){
     const res=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":options.prefer||"return=representation",...(options.headers||{})}});
@@ -760,6 +755,8 @@
   }
 
   const COMERCIALES=["Ruben","Carles","Aaron"];
+  const DEAL_STATUSES=["cerrar","posible","proyecto"];
+  const DEAL_LABELS={cerrar:"Para cerrar",posible:"Posible pedido",proyecto:"Proyecto a 1 año vista"};
   let dealComments={};let commentDealId=null;
 
   function fmtDateTime(iso){
@@ -819,46 +816,23 @@
 
   function updateDeals(){
     const vd=visibleDeals();
-    document.getElementById("count-comercial").textContent=vd.filter(d=>d.status!=="ganado").length;
-    document.getElementById("cnt-deal-posible").textContent=vd.filter(d=>d.status==="posible").length;
-    document.getElementById("cnt-deal-ganado").textContent=vd.filter(d=>d.status==="ganado").length;
+    document.getElementById("count-comercial").textContent=vd.filter(d=>DEAL_STATUSES.includes(d.status)).length;
+    DEAL_STATUSES.forEach(k=>{document.getElementById("cnt-deal-"+k).textContent=vd.filter(d=>d.status===k).length;});
     if(currentTab==="comercial") renderDeals();
   }
 
   function renderDeals(){
-    const posibles=visibleDeals().filter(d=>d.status==="posible").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-    // Fill column 1 up to capacity, then column 2, etc. Beyond 4*CAPACITY, overflow into last column with scroll.
-    const CAPACITY=7;
-    const buckets=[[],[],[],[]];
-    posibles.forEach((d,i)=>buckets[Math.min(Math.floor(i/CAPACITY),3)].push(d));
-    for(let i=0;i<4;i++){
-      const c=document.getElementById("deal-cards-posible-"+i);
-      c.innerHTML=buckets[i].length===0
-        ?`<div style="text-align:center;padding:20px 10px;color:var(--text3);font-size:12px;">Sin ofertas</div>`
-        :buckets[i].map(d=>buildDealCard(d)).join("");
-    }
-    if(dealGanadoExpanded) renderGanadoCards();
-  }
-
-  function renderGanadoCards(){
-    const c=document.getElementById("deal-cards-ganado");
-    const ganados=visibleDeals().filter(d=>d.status==="ganado").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-    c.innerHTML=ganados.length===0
-      ?`<div style="text-align:center;padding:20px 10px;color:var(--text3);font-size:12px;">Sin ganados aún</div>`
-      :ganados.map(d=>buildDealCard(d)).join("");
-  }
-
-  function toggleDealGanado(){
-    dealGanadoExpanded=!dealGanadoExpanded;
-    document.getElementById("deal-col-ganado").classList.toggle("expanded",dealGanadoExpanded);
-    const cardsEl=document.getElementById("deal-cards-ganado");
-    cardsEl.style.display=dealGanadoExpanded?"flex":"none";
-    cardsEl.style.flexDirection="column";
-    cardsEl.style.gap="8px";
-    cardsEl.style.padding="10px";
-    cardsEl.style.overflowY="auto";
-    cardsEl.style.maxHeight="var(--col-h)";
-    if(dealGanadoExpanded) renderGanadoCards();
+    const vd=visibleDeals();
+    const sorted=st=>vd.filter(d=>d.status===st).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    const empty=`<div style="text-align:center;padding:20px 10px;color:var(--text3);font-size:12px;">Sin ofertas</div>`;
+    const fill=(id,list)=>{document.getElementById("deal-cards-"+id).innerHTML=list.length?list.map(d=>buildDealCard(d)).join(""):empty;};
+    fill("cerrar",sorted("cerrar"));
+    fill("proyecto",sorted("proyecto"));
+    // Posible pedido: se reparte en 3 columnas, 7 por columna (de izquierda a derecha); el exceso hace scroll en la última
+    const CAPACITY=7,N=3;
+    const buckets=[];for(let k=0;k<N;k++)buckets.push([]);
+    sorted("posible").forEach((d,i)=>buckets[Math.min(Math.floor(i/CAPACITY),N-1)].push(d));
+    buckets.forEach((b,k)=>fill("posible-"+k,b));
   }
 
   function buildDealCard(deal){
@@ -894,7 +868,7 @@
     document.getElementById("d-client").value="";
     buildDealSelects();
     document.getElementById("d-assignee").value=(dealFilter&&COMERCIALES.includes(dealFilter))?dealFilter:(COMERCIALES.includes(currentUser)?currentUser:COMERCIALES[0]);
-    document.getElementById("d-status").value=defaultStatus||"oferta";
+    document.getElementById("d-status").value=defaultStatus||"posible";
     document.getElementById("deal-modal-overlay").classList.remove("hidden");
     setTimeout(()=>document.getElementById("d-client").focus(),100);
   }
@@ -956,8 +930,7 @@
     try{
       await sbFetch("deals?id=eq."+dealDragId,{method:"PATCH",prefer:"return=minimal",body:JSON.stringify({status:newStatus})});
       deal.status=newStatus;updateDeals();
-      const labels={posible:"Posible pedido",ganado:"Ganado"};
-      toast("↕️ Movida a "+labels[newStatus]);
+      toast("↕️ Movida a "+DEAL_LABELS[newStatus]);
     }catch(e){toast("❌ Error al mover");}
     dealDragId=null;
   }
